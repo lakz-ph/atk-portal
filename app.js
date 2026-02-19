@@ -1,196 +1,143 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import {
-  getFirestore, collection, addDoc, getDocs
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ATK Service Dashboard</title>
 
-/* ================= FIREBASE ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyC3PzfKBSKGVnYjfwaeKxEMA-JJrmhNScw",
-  authDomain: "atk-drone-service-portal.firebaseapp.com",
-  projectId: "atk-drone-service-portal"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-/* ================= DOM ================= */
-const ticketId = document.getElementById("ticketId");
-const nameEl   = document.getElementById("name");
-const phoneEl  = document.getElementById("phone");
-const modelEl  = document.getElementById("model");
-const problemEl= document.getElementById("problem");
-const dateEl   = document.getElementById("date");
-const statusEl = document.getElementById("status");
-const userEmailBox = document.getElementById("userEmail");
-
-let currentUserEmail = "";
-
-/* ================= USER SHORT NAME ================= */
-function getShortUser(email){
-  if(!email) return "";
-  return email.split("@")[0];   // lakz@atk.com → lakz
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#111;
+  color:white;
+  padding:20px;
 }
 
-/* ================= AUTH ================= */
-onAuthStateChanged(auth,user=>{
-  if(!user) window.location="index.html";
-  else{
-    currentUserEmail=user.email;
-    userEmailBox.innerText="Logged in: "+user.email;
-    showCurrentTicket();
-  }
-});
+h2,h3{margin-top:20px;}
 
-document.getElementById("logoutBtn").onclick=()=>{
-  signOut(auth).then(()=>window.location="index.html");
-};
-
-/* ================= TICKET SYSTEM (FROM TICKETS ONLY) ================= */
-
-async function getHighestTicket(){
-  const snap = await getDocs(collection(db,"tickets"));
-  let max = 25280;
-
-  snap.forEach(d=>{
-    const v = d.data().ticket;
-    if(v && v.startsWith("ATK")){
-      const n = parseInt(v.replace("ATK",""));
-      if(n > max) max = n;
-    }
-  });
-  return max;
+input, textarea, select{
+  display:block;
+  margin:8px 0;
+  padding:8px;
+  width:300px;
+  border-radius:6px;
+  border:none;
 }
 
-async function showCurrentTicket(){
-  const max = await getHighestTicket();
-  ticketId.value = "ATK" + (max + 1);
+textarea{height:70px;}
+
+button{
+  padding:8px 15px;
+  margin-top:10px;
+  cursor:pointer;
+  border:none;
+  border-radius:6px;
+  background:#2196f3;
+  color:white;
 }
 
-async function generateTicket(){
-  const max = await getHighestTicket();
-  return "ATK" + (max + 1);
+.selector{
+  padding:10px;
+  background:#333;
+  cursor:pointer;
+  border-radius:6px;
+  width:300px;
+  margin-top:5px;
 }
 
-/* ================= RC & ACCESSORIES ================= */
-
-const rcList=[
-  ["DJI RC N1","#f44336"],["DJI RC N2","#ff9800"],["DJI RC N3","#4caf50"],
-  ["DJI RC","#2196f3"],["DJI RC2","#9c27b0"],["DJI RC PRO","#ff5722"],
-  ["DJI RC PRO2","#ffc107"],["DJI SMART RC","#4caf50"],["DJI RC 3","#2196f3"]
-];
-
-const accList=[
-  ["1 Battery","#f44336"],["2 Battery","#ff9800"],["3 Battery with Hub","#4caf50"],
-  ["Gimbal Cap","#2196f3"],["Prop Guard","#9c27b0"],["Bag","#ff5722"],
-  ["Box","#ffc107"],["Inbuild 4 Prop","#4caf50"],["Memory Card","#2196f3"],
-  ["ND Filter","#9c27b0"],["C to C Cable","#ff5722"],["C to Lightning Cable","#ffc107"],["Charger","#4caf50"]
-];
-
-let selectedRC="";
-let selectedAcc=[];
-
-function makeTag(name,color,click){
-  const t=document.createElement("div");
-  t.className="tag";
-  t.style.background=color;
-  t.innerText=name;
-  t.onclick=click;
-  return t;
+.dropdown{
+  display:none;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:10px;
 }
 
-/* RC */
-const rcOptions=document.getElementById("rcOptions");
-rcList.forEach(r=>{
-  rcOptions.appendChild(makeTag(r[0],r[1],()=>{
-    selectedRC=r[0];
-    document.getElementById("rcSelected").innerHTML="";
-    document.getElementById("rcSelected").appendChild(
-      makeTag(r[0],r[1],()=>{selectedRC="";document.getElementById("rcSelected").innerHTML="";})
-    );
-    rcOptions.style.display="none";
-  }));
-});
-window.toggleRC=()=>rcOptions.style.display=rcOptions.style.display=="flex"?"none":"flex";
-
-/* ACC */
-const accOptions=document.getElementById("accOptions");
-accList.forEach(a=>{
-  accOptions.appendChild(makeTag(a[0],a[1],()=>{
-    if(!selectedAcc.includes(a[0])){
-      selectedAcc.push(a[0]);
-      renderAcc();
-    }
-  }));
-});
-function renderAcc(){
-  const box=document.getElementById("accSelected");
-  box.innerHTML="";
-  selectedAcc.forEach(a=>{
-    const color=accList.find(x=>x[0]==a)[1];
-    box.appendChild(makeTag(a,color,()=>{selectedAcc=selectedAcc.filter(x=>x!=a);renderAcc();}));
-  });
+.tag{
+  padding:6px 10px;
+  border-radius:20px;
+  color:white;
+  cursor:pointer;
+  font-size:12px;
+  margin:4px;
 }
-window.toggleACC=()=>accOptions.style.display=accOptions.style.display=="flex"?"none":"flex";
 
-/* ================= SAVE ================= */
-document.getElementById("saveBtn").onclick=async()=>{
-  if(!nameEl.value||!phoneEl.value||!modelEl.value||!problemEl.value||!dateEl.value||!selectedRC){
-    alert("Fill all fields");
-    return;
-  }
+table{
+  margin-top:20px;
+  width:100%;
+  border-collapse:collapse;
+}
 
-  const newTicket = await generateTicket();
+th,td{
+  padding:6px;
+  border:1px solid #444;
+  font-size:12px;
+}
 
-  await addDoc(collection(db,"tickets"),{
-    ticket:newTicket,
-    name:nameEl.value,
-    phone:phoneEl.value,
-    model:modelEl.value,
-    rc:selectedRC,
-    acc:selectedAcc.join(", "),
-    problem:problemEl.value,
-    date:dateEl.value,
-    status:statusEl.value,
-    user: getShortUser(currentUserEmail)   // ✅ only short name stored
-  });
+</style>
+</head>
 
-  alert("Saved "+newTicket);
+<body>
 
-  nameEl.value=phoneEl.value=modelEl.value=problemEl.value=dateEl.value="";
-  selectedRC=""; selectedAcc=[];
-  document.getElementById("rcSelected").innerHTML="";
-  renderAcc();
+<h2>ATK Service Dashboard</h2>
 
-  showCurrentTicket();
-};
+<div id="userEmail"></div>
+<button id="logoutBtn">Logout</button>
 
-/* ================= SEARCH ================= */
-search.addEventListener("input",async()=>{
-  const q=search.value.toLowerCase();
-  results.innerHTML="";
-  recordsTable.style.display="none";
-  if(q==="") return;
+<hr>
 
-  const snap=await getDocs(collection(db,"tickets"));
-  snap.forEach(d=>{
-    const t=d.data();
-    if(t.ticket.toLowerCase().includes(q)||t.name.toLowerCase().includes(q)||t.phone.includes(q)||t.date.includes(q)){
-      recordsTable.style.display="table";
-      results.innerHTML+=`
-      <tr>
-      <td>${t.date}</td>
-      <td>${t.ticket}</td>
-      <td>${t.name}</td>
-      <td>${t.model}</td>
-      <td>${t.rc}</td>
-      <td>${t.acc}</td>
-      <td>${t.problem}</td>
-      <td>${t.phone}</td>
-      <td>${t.status}</td>
-      <td>${t.user}</td>
-      </tr>`;
-    }
-  });
-});
+<input id="ticketId" readonly placeholder="Ticket ID">
+<input id="name" placeholder="Customer Name">
+<input id="phone" placeholder="Phone">
+<input id="model" placeholder="Drone Model">
+
+<!-- RC TYPE -->
+<h3>RC Type</h3>
+<div onclick="toggleRC()" class="selector">Select RC</div>
+<div id="rcOptions" class="dropdown"></div>
+<div id="rcSelected"></div>
+
+<!-- ACCESSORIES -->
+<h3>Accessories</h3>
+<div onclick="toggleACC()" class="selector">Select Accessories</div>
+<div id="accOptions" class="dropdown"></div>
+<div id="accSelected"></div>
+
+<textarea id="problem" placeholder="Problem Description"></textarea>
+
+<input type="date" id="date">
+
+<select id="status">
+  <option value="Waiting">Waiting</option>
+  <option value="In Progress">In Progress</option>
+  <option value="Completed">Completed</option>
+</select>
+
+<button id="saveBtn">Save Ticket</button>
+
+<hr>
+
+<h3>Search Records</h3>
+<input id="search" placeholder="Search by name / ticket / phone / date">
+
+<table id="recordsTable" style="display:none;">
+<thead>
+<tr>
+<th>Date</th>
+<th>Ticket</th>
+<th>Name</th>
+<th>Model</th>
+<th>RC</th>
+<th>Accessories</th>
+<th>Problem</th>
+<th>Phone</th>
+<th>Status</th>
+<th>User</th>
+</tr>
+</thead>
+<tbody id="results"></tbody>
+</table>
+
+<!-- IMPORTANT: MUST BE MODULE -->
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
