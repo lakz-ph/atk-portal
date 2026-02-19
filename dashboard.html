@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>ATK Dashboard</title>
+
+<!-- 🔐 Firebase Login Guard -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC3PzfKBSKGVnYjfwaeKxEMA-JJrmhNScw",
+  authDomain: "atk-drone-service-portal.firebaseapp.com",
+  projectId: "atk-drone-service-portal"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+/* Hide everything until auth is confirmed */
+document.documentElement.style.display = "none";
+
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.replace("index.html");
+  } else {
+    document.documentElement.style.display = "block";
+    document.getElementById("userEmail").innerText = user.email;
+  }
+});
+
+/* Logout */
+window.logoutNow = function(){
+  signOut(auth).then(()=>{
+    window.location.replace("index.html");
+  });
+};
+</script>
+
+<style>
+body{
+  background:#111;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+
+input, textarea, select, button{
+  width:100%;
+  padding:10px;
+  margin:6px 0;
+  border-radius:6px;
+  border:none;
+}
+
+button{
+  background:#2196f3;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:10px;
+}
+
+.userbox{
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+}
+
+.userpill{
+  background:#2196f3;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:13px;
+}
+
+.logoutbtn{
+  background:#e53935;
+  margin-top:6px;
+  padding:6px 14px;
+  border-radius:10px;
+  width:auto;
+}
+
+.section{
+  margin-top:20px;
+}
+
+.select-box{
+  background:#222;
+  padding:10px;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+.option-grid{
+  display:none;
+  background:#1a1a1a;
+  padding:10px;
+  border-radius:10px;
+  margin-top:8px;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.tag{
+  padding:6px 12px;
+  border-radius:20px;
+  color:white;
+  cursor:pointer;
+  font-size:13px;
+}
+
+.selected-box{
+  margin-top:8px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th,td{
+  border:1px solid #444;
+  padding:8px;
+}
+
+th{
+  background:#222;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <h2>ATK Service Dashboard</h2>
+  <div class="userbox">
+    <div class="userpill" id="userEmail">Logged in</div>
+    <button class="logoutbtn" onclick="logoutNow()">Logout</button>
+  </div>
+</div>
+
+<input id="ticketId" readonly>
+<input id="name" placeholder="Customer Name">
+<input id="phone" placeholder="Phone">
+<input id="model" placeholder="Drone Model">
+
+<div class="section">
+<b>RC Type</b>
+<div class="select-box" onclick="toggleRC()">Select RC</div>
+<div id="rcOptions" class="option-grid"></div>
+<div id="rcSelected" class="selected-box"></div>
+</div>
+
+<div class="section">
+<b>Accessories</b>
+<div class="select-box" onclick="toggleACC()">Select Accessories</div>
+<div id="accOptions" class="option-grid"></div>
+<div id="accSelected" class="selected-box"></div>
+</div>
+
+<textarea id="problem" placeholder="Problem"></textarea>
+<input type="date" id="date">
+
+<select id="status">
+  <option>Waiting</option>
+  <option>In Repair</option>
+  <option>Delivered</option>
+</select>
+
+<button id="saveBtn">Save Ticket</button>
+
+<h3>Service Records</h3>
+<input id="search" placeholder="Search Ticket / Name / Phone / Date">
+
+<table id="recordsTable" style="display:none;">
+<thead>
+<tr>
+  <th>Date</th>
+  <th>Ticket</th>
+  <th>Name</th>
+  <th>Drone</th>
+  <th>RC</th>
+  <th>Accessories</th>
+  <th>Problem</th>
+  <th>Phone</th>
+  <th>Status</th>
+  <th>User</th>
+</tr>
+</thead>
+<tbody id="results"></tbody>
+</table>
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
+
+dashbord.html
