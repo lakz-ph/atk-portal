@@ -1,176 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>ATK Login</title>
-
-<style>
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  font-family: Arial;
-  overflow:hidden;
-}
-
-/* Background Video */
-#bgVideo{
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  object-position: center;
-  z-index: -1;
-}
-
-/* Dark overlay */
-.overlay{
-  position:fixed;
-  top:0; left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.65);
-  z-index:0;
-}
-
-/* Login Box */
-.box{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:rgba(20,20,20,0.9);
-  padding:35px;
-  border-radius:12px;
-  width:320px;
-  color:white;
-  z-index:2;
-  box-shadow:0 0 40px black;
-}
-
-.box h2{
-  text-align:center;
-  margin-bottom:20px;
-}
-
-input,button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:5px;
-  border:none;
-  font-size:15px;
-}
-
-button{
-  background:#2196F3;
-  color:white;
-  cursor:pointer;
-}
-
-#techBtn{
-  background:#4CAF50;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>ATK LOGIN</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
-<!-- 🎥 Background Video -->
-<video autoplay muted loop id="bgVideo">
-  <source src="lakz12.mp4" type="video/mp4">
-</video>
+  <!-- Background Video -->
+  <video autoplay muted loop id="bg-video">
+    <source src="lakz12.mp4" type="video/mp4">
+  </video>
 
-<div class="overlay"></div>
+  <!-- Login Card -->
+  <div class="login-container">
+    <div class="login-card">
+      <h2>ATK LOGIN</h2>
 
-<!-- Error Message -->
-<div id="errorBox" style="
-  display:none;
-  position:absolute;
-  top:20px;
-  left:50%;
-  transform:translateX(-50%);
-  background:#ff5252;
-  color:white;
-  padding:12px 20px;
-  border-radius:8px;
-  font-weight:bold;
-  box-shadow:0 0 15px black;
-  z-index:5;
-"></div>
+      <input type="email" id="email" placeholder="Email">
+      <input type="password" id="password" placeholder="Password">
 
-<!-- Login Box -->
-<div class="box">
-  <h2>ATK Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <button id="techBtn" onclick="window.location='tech-login.html'">Technician Portal</button>
-</div>
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
 
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app-check.js";
-
-/* 🔥 Firebase config */
-const firebaseConfig = {
-  apiKey: "AIzaSyC3PzfKBSKGVnYjfwaeKxEMA-JJrmhNScw",
-  authDomain: "atk-drone-service-portal.firebaseapp.com",
-  projectId: "atk-drone-service-portal"
-};
-
-/* Initialize Firebase */
-const app = initializeApp(firebaseConfig);
-
-/* 🔒 Enable Firebase App Check */
-initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider("6LdI1kssAAAAAA1j-s5seCblEE2J__ywXCnv13Vw"),
-  isTokenAutoRefreshEnabled: true
-});
-
-/* Auth */
-const auth = getAuth(app);
-
-/* DOM */
-const email = document.getElementById("email");
-const password = document.getElementById("password");
-
-window.login = function(){
-
-  if(!email.value || !password.value){
-    showError("Enter email and password");
-    return;
-  }
-
-  /* 🔐 Only ATK emails */
-  if(!email.value.toLowerCase().endsWith("@atk.com")){
-    showError("Only ATK staff can login");
-    return;
-  }
-
-  signInWithEmailAndPassword(auth, email.value, password.value)
-    .then(()=>{
-      localStorage.setItem("loginTime", Date.now());
-      window.location.replace("dashboard.html");
-    })
-    .catch(err=>{
-      console.error(err);
-      showError("Login failed — check email or password");
-    });
-};
-
-function showError(msg){
-  const box = document.getElementById("errorBox");
-  box.innerText = msg;
-  box.style.display = "block";
-  setTimeout(()=>{ box.style.display="none"; }, 3000);
-}
-</script>
-
+  <script src="script.js"></script>
 </body>
 </html>
-
-this is index.html make changes
