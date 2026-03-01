@@ -10,7 +10,6 @@ body, html {
   overflow: hidden;
 }
 
-/* Background Video */
 #bg-video {
   position: fixed;
   right: 0;
@@ -21,7 +20,6 @@ body, html {
   z-index: -1;
 }
 
-/* Center Container */
 .login-container {
   display: flex;
   justify-content: center;
@@ -29,7 +27,6 @@ body, html {
   height: 100%;
 }
 
-/* Glass Card */
 .login-card {
   background: rgba(0, 0, 0, 0.7);
   padding: 40px;
@@ -51,7 +48,6 @@ input {
   margin-bottom: 15px;
   border: none;
   border-radius: 6px;
-  outline: none;
 }
 
 button {
@@ -67,4 +63,9 @@ button {
 
 button:hover {
   background: #1565c0;
+}
+
+#errorMsg {
+  margin-top: 10px;
+  color: red;
 }

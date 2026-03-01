@@ -12,18 +12,19 @@
     <source src="lakz12.mp4" type="video/mp4">
   </video>
 
-  <!-- Login Card -->
   <div class="login-container">
     <div class="login-card">
       <h2>ATK LOGIN</h2>
 
-      <input type="email" id="email" placeholder="Email">
-      <input type="password" id="password" placeholder="Password">
+      <input type="email" id="email" placeholder="Email" required>
+      <input type="password" id="password" placeholder="Password" required>
 
-      <button onclick="login()">Login</button>
+      <button id="loginBtn">Login</button>
+
+      <p id="errorMsg"></p>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
